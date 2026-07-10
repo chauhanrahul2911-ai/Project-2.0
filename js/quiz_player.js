@@ -247,9 +247,6 @@ function showFinalPage() {
 }
 
 function saveAndGoHome() {
-    sessionStorage.setItem('last_active_subject', subject);
-    sessionStorage.setItem('last_active_branch', branchFolder);
-    sessionStorage.setItem('last_active_type', type);
     window.location.href = 'index.html';
 }
 
