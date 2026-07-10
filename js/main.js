@@ -300,9 +300,9 @@ window.onload = function() {
     updateProfileUI();
     buildSubjectCards();
 
-    const savedSubject = localStorage.getItem('last_active_subject');
-    const savedBranch = localStorage.getItem('last_active_branch');
-    const savedType = localStorage.getItem('last_active_type');
+    const savedSubject = sessionStorage.getItem('last_active_subject');
+    const savedBranch = sessionStorage.getItem('last_active_branch');
+    const savedType = sessionStorage.getItem('last_active_type');
 
     if (savedSubject && savedBranch && savedType) {
         currentSubject = savedSubject;
