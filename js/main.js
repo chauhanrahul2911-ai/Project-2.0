@@ -259,9 +259,9 @@ function buildQuizRows() {
                 } else { openPaywall(); }
             } else {
                 // Session tracking variables sync back logic
-                localStorage.setItem('last_active_subject', currentSubject);
-                localStorage.setItem('last_active_branch', currentBranch);
-                localStorage.setItem('last_active_type', currentType);
+                sessionStorage.setItem('last_active_subject', currentSubject);
+                sessionStorage.setItem('last_active_branch', currentBranch);
+                sessionStorage.setItem('last_active_type', currentType);
 
                 // 🎯 100% SATEEK DATA EXTRACTION: Bina kisi mismatch ke English & Gujarati values separate bhejega
                 let branchFolder = currentBranch; // English path parameter e.g., "gujarat_history"
@@ -313,8 +313,8 @@ window.onload = function() {
         goToTypeSelect(currentBranch);
         goToQuizList(currentType);
 
-        localStorage.removeItem('last_active_subject');
-        localStorage.removeItem('last_active_branch');
-        localStorage.removeItem('last_active_type');
+        sessionStorage.removeItem('last_active_subject');
+        sessionStorage.removeItem('last_active_branch');
+        sessionStorage.removeItem('last_active_type');
     }
 };
