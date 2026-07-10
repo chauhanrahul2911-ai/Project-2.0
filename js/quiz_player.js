@@ -247,7 +247,10 @@ function showFinalPage() {
 }
 
 function saveAndGoHome() {
-    window.location.href = "index.html?from_quiz_player=true";
+    sessionStorage.setItem('last_active_subject', subject);
+    sessionStorage.setItem('last_active_branch', branchFolder);
+    sessionStorage.setItem('last_active_type', type);
+    window.location.href = 'index.html';
 }
 
 // Absolute Restart Machine
