@@ -247,7 +247,7 @@ function showFinalPage() {
 }
 
 function saveAndGoHome() {
-    window.location.href = 'index.html';
+    window.location.href = "index.html?from_quiz_player=true";
 }
 
 // Absolute Restart Machine
