@@ -295,11 +295,13 @@ function simulatePayment() {
     alert("પેમેન્ટ સફળ રહ્યું! બધા લોક ખુલી ગયા છે.");
 }
 
-// ENTRY STARTUP INITS (Smart Auto-Route Engine)
-window.onload = function() {
+// --- ⚙️ ENTRY STARTUP INITS (RE-ENGINEERED FOR SESSIONSTORAGE & AUTO-REFRESH) ---
+
+function initDashboard() {
     updateProfileUI();
     buildSubjectCards();
 
+    // 🔄 Pure memory system ko sessionStorage par shift kar diya hai
     const savedSubject = sessionStorage.getItem('last_active_subject');
     const savedBranch = sessionStorage.getItem('last_active_branch');
     const savedType = sessionStorage.getItem('last_active_type');
@@ -313,8 +315,23 @@ window.onload = function() {
         goToTypeSelect(currentBranch);
         goToQuizList(currentType);
 
+        // 🔥 Magic Line: Turant memory saaf taaki background kill aur refresh sahi chale!
         sessionStorage.removeItem('last_active_subject');
         sessionStorage.removeItem('last_active_branch');
         sessionStorage.removeItem('last_active_type');
+    }
+}
+
+// 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
+window.onload = function() {
+    initDashboard();
+};
+
+// 📱 Case 2: HARDWARE BACK BUTTON PROTECTION ENGINE
+// Jab bacha quiz player se hardware back button daba kar aayega, tab ye event fire hoga
+window.onpageshow = function(event) {
+    // event.persisted = true ka matlab hai page browser ki history cache se wapas aaya hai
+    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        initDashboard(); // 🚀 Bina page reload kiye screen ki progress ko automatic update kar dega!
     }
 };
