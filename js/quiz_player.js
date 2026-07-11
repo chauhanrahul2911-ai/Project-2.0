@@ -247,7 +247,9 @@ function showFinalPage() {
 }
 
 function saveAndGoHome() {
-    window.location.href = 'index.html';
+    // 🚀 MAGIC CHANGE: href ki jagah replace() use karo!
+    // Yeh browser ki history se quiz_player.html ko hamesha ke liye mita dega
+    window.location.replace("index.html");
 }
 
 // Absolute Restart Machine
