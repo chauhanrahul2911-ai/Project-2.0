@@ -76,8 +76,6 @@ function changeScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
     window.scrollTo(0,0);
-    // 🔥 Magic Line: Browser ki history stack mein is screen ki pehchan daal do
-    window.history.pushState({ activeScreen: screenId }, "");
 }
 
 // --- 🧮 NEW DYNAMIC PROGRESS TRACKING ---
@@ -317,12 +315,6 @@ function initDashboard() {
         goToTypeSelect(currentBranch);
         goToQuizList(currentType);
 
-        // 🔥 History stack ko manually build karo taaki back button ko sequence yaad rahe
-        window.history.pushState({ activeScreen: 'screen-subjects' }, "");
-        window.history.pushState({ activeScreen: 'screen-branches' }, "");
-        window.history.pushState({ activeScreen: 'screen-type-select' }, "");
-        window.history.pushState({ activeScreen: 'screen-quiz-list' }, "");
-
         // 🔥 Magic Line: Turant memory saaf taaki background kill aur refresh sahi chale!
         sessionStorage.removeItem('last_active_subject');
         sessionStorage.removeItem('last_active_branch');
@@ -343,23 +335,29 @@ window.onpageshow = function(event) {
         initDashboard(); // 🚀 Bina page reload kiye screen ki progress ko automatic update kar dega!
     }
 };
-// 📱 HARDWARE BACK BUTTON NAVIGATION ENGINE
+// 📱 HARDWARE BACK BUTTON TRIGERRING ENGINE (LAST MEIN LAGAYEIN)
 window.onpopstate = function(event) {
-    // Agar koi state save nahi hai, toh automatic main Subject Screen par bhej do
-    if (!event.state || !event.state.activeScreen) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-subjects').classList.add('active');
-        return;
+    // 1. Pata karo ki abhi screen par kaun si screen active (khuli) hai
+    const currentActiveScreen = document.querySelector('.screen.active')?.id;
+
+    // 2. Agar bacha sabse pehli screen (Subject List) par hai, toh call hi mat karo (browser website se exit ho jayega)
+    if (currentActiveScreen === 'screen-subjects') {
+        return; 
     }
 
-    const currentActiveScreen = event.state.activeScreen;
+    // 3. 🔥 AAPKA LOGIC: Current screen ke hisab se target screen chuniyen
+    let targetScreen = 'screen-subjects';
 
-    // Strict Sequence Control: Kaun si screen se kahan peeche jaana hai
     if (currentActiveScreen === 'screen-quiz-list') {
-        changeScreen('screen-type-select');
+        targetScreen = 'screen-type-select'; // Quiz list se peeche Type Select
     } else if (currentActiveScreen === 'screen-type-select') {
-        changeScreen('screen-branches');
+        targetScreen = 'screen-branches';    // Type Select se peeche Branch Select
     } else if (currentActiveScreen === 'screen-branches') {
-        changeScreen('screen-subjects');
+        targetScreen = 'screen-subjects';    // Branch Select se peeche Subject List
     }
+
+    // 4. 🔥 DIRECT HTML MANIPULATION (Bina pushState ko chhede)
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); //
+    document.getElementById(targetScreen).classList.add('active'); //
+    window.scrollTo(0,0); //
 };
