@@ -76,6 +76,9 @@ function changeScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
     window.scrollTo(0,0);
+  if (!window.history.state || window.history.state.activeScreen !== screenId) {
+        window.history.pushState({ activeScreen: screenId }, "");
+  }
 }
 
 // --- 🧮 NEW DYNAMIC PROGRESS TRACKING ---
