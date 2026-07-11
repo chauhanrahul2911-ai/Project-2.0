@@ -76,6 +76,8 @@ function changeScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
     window.scrollTo(0,0);
+    // 🔥 Magic Line: Browser ki history stack mein is screen ki pehchan daal do
+    window.history.pushState({ activeScreen: screenId }, "");
 }
 
 // --- 🧮 NEW DYNAMIC PROGRESS TRACKING ---
@@ -315,6 +317,12 @@ function initDashboard() {
         goToTypeSelect(currentBranch);
         goToQuizList(currentType);
 
+        // 🔥 History stack ko manually build karo taaki back button ko sequence yaad rahe
+        window.history.pushState({ activeScreen: 'screen-subjects' }, "");
+        window.history.pushState({ activeScreen: 'screen-branches' }, "");
+        window.history.pushState({ activeScreen: 'screen-type-select' }, "");
+        window.history.pushState({ activeScreen: 'screen-quiz-list' }, "");
+
         // 🔥 Magic Line: Turant memory saaf taaki background kill aur refresh sahi chale!
         sessionStorage.removeItem('last_active_subject');
         sessionStorage.removeItem('last_active_branch');
@@ -333,5 +341,25 @@ window.onpageshow = function(event) {
     // event.persisted = true ka matlab hai page browser ki history cache se wapas aaya hai
     if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
         initDashboard(); // 🚀 Bina page reload kiye screen ki progress ko automatic update kar dega!
+    }
+};
+// 📱 HARDWARE BACK BUTTON NAVIGATION ENGINE
+window.onpopstate = function(event) {
+    // Agar koi state save nahi hai, toh automatic main Subject Screen par bhej do
+    if (!event.state || !event.state.activeScreen) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-subjects').classList.add('active');
+        return;
+    }
+
+    const currentActiveScreen = event.state.activeScreen;
+
+    // Strict Sequence Control: Kaun si screen se kahan peeche jaana hai
+    if (currentActiveScreen === 'screen-quiz-list') {
+        changeScreen('screen-type-select');
+    } else if (currentActiveScreen === 'screen-type-select') {
+        changeScreen('screen-branches');
+    } else if (currentActiveScreen === 'screen-branches') {
+        changeScreen('screen-subjects');
     }
 };
