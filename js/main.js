@@ -108,7 +108,7 @@ function changeScreen(screenId) {
     document.getElementById(screenId).classList.add('active');
     window.scrollTo(0,0);
     window.history.pushState({ activeScreen: screenId }, "");
-    }
+    
   
 }
 
