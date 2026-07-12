@@ -75,7 +75,11 @@ function changeScreenFromSidebar(screenId) {
 function changeScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
-    window.scrollTo(0,0);  
+    window.scrollTo(0,0);
+    if (!window.history.state || window.history.state.activeScreen !== screenId) {
+        window.history.pushState({ activeScreen: screenId }, "");
+    }
+  
 }
 
 // --- 🧮 NEW DYNAMIC PROGRESS TRACKING ---
@@ -335,33 +339,29 @@ window.onpageshow = function(event) {
         initDashboard(); // 🚀 Bina page reload kiye screen ki progress ko automatic update kar dega!
     }
 };
-function handleAppBackNavigation() {
-    // 1. Pata karo abhi kaun si screen active khuli hui hai
+// 📱 HARDWARE BACK BUTTON TRIGERRING ENGINE (LAST MEIN LAGAYEIN)
+window.onpopstate = function(event) {
+    // 1. Pata karo ki abhi screen par kaun si screen active (khuli) hai
     const currentActiveScreen = document.querySelector('.screen.active')?.id;
 
-    // 2. 🎯 AAPKA REAL LOGIC: Kon si screen se kahan peeche bhejna hai
-    if (currentActiveScreen === 'screen-quiz-list') {
-        changeScreen('screen-type-select'); // Quiz list se peeche Type Select
-    } else if (currentActiveScreen === 'screen-type-select') {
-        changeScreen('screen-branches');    // Type Select se peeche Branch Select
-    } else if (currentActiveScreen === 'screen-branches') {
-        changeScreen('screen-subjects');    // Branch Select se peeche Subject List
-    } else if (currentActiveScreen === 'screen-subjects') {
-        // Agar bacha pehli screen par hai, toh koi action mat lo (browser ko exit karne do)
-        return false; 
+    // 2. Agar bacha sabse pehli screen (Subject List) par hai, toh call hi mat karo (browser website se exit ho jayega)
+    if (currentActiveScreen === 'screen-subjects') {
+        return; 
     }
-    return true; // Navigation successfully handled inside app 
-}
-// 📱 HARDWARE BACK BUTTON HIJACK ENGINE
-// Browser ko hamesha 1 dummy state maintain rakhne par majboor karo taaki back dabane par site close na ho
-window.history.pushState({ dummy: true }, "");
 
-window.onpopstate = function(event) {
-    // Hamare manual engine ko chalao
-    const handled = handleAppBackNavigation();
-    
-    if (handled) {
-        // Agar app ke andar screen peeche badal gayi hai, toh browser ko fir se block karo exit hone se
-        window.history.pushState({ dummy: true }, "");
+    // 3. 🔥 AAPKA LOGIC: Current screen ke hisab se target screen chuniyen
+    let targetScreen = 'screen-subjects';
+
+    if (currentActiveScreen === 'screen-quiz-list') {
+        targetScreen = 'screen-type-select'; // Quiz list se peeche Type Select
+    } else if (currentActiveScreen === 'screen-type-select') {
+        targetScreen = 'screen-branches';    // Type Select se peeche Branch Select
+    } else if (currentActiveScreen === 'screen-branches') {
+        targetScreen = 'screen-subjects';    // Branch Select se peeche Subject List
     }
+
+    // 4. 🔥 DIRECT HTML MANIPULATION (Bina pushState ko chhede)
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); //
+    document.getElementById(targetScreen).classList.add('active'); //
+    window.scrollTo(0,0); //
 };
