@@ -60,6 +60,7 @@ let currentSubject = ""; // Stores English Key (e.g., "samanya_gyan")
 let currentBranch = "";  // Stores English Key (e.g., "gujarat_history")
 let currentType = "";
 let isPremiumUser = (localStorage.getItem('gsrtc_is_premium') === 'true');
+let skipPopState = false;
 
 // --- SIDEBAR TOGGLE FUNCTIONS ---
 function toggleSidebar() {
@@ -67,9 +68,39 @@ function toggleSidebar() {
     document.getElementById('sidebar-overlay').classList.toggle('show');
 }
 
-function changeScreenFromSidebar(screenId) {
-    changeScreen(screenId);
-    toggleSidebar();
+function changeScreenFromSidebar() {
+    const currentActiveScreen = document.querySelector('.screen.active')?.id;
+
+    if (currentActiveScreen === 'screen-quiz-list') { 
+        skipPopState = true; // 🔥 Jump se theek pehle true kiya
+        window.history.go(-3); 
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-subjects').classList.add('active'); 
+        toggleSidebar();
+        return;
+    } 
+    else if (currentActiveScreen === 'screen-type-select') {
+        skipPopState = true; // 🔥 Jump se theek pehle true kiya
+        window.history.go(-2); 
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-subjects').classList.add('active'); 
+        toggleSidebar();
+        return;
+    } 
+    else if (currentActiveScreen === 'screen-branches') {
+        skipPopState = true; // 🔥 Jump se theek pehle true kiya
+        window.history.go(-1); 
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-subjects').classList.add('active'); 
+        toggleSidebar();
+        return;
+    }
+    else {
+        // Agar pehle se subject screen par hai, toh flag ko false hi rakhein
+        skipPopState = false; 
+        toggleSidebar();
+        return;
+    }
 }
 
 function changeScreen(screenId) {
@@ -341,6 +372,10 @@ window.onpageshow = function(event) {
 };
 // 📱 HARDWARE BACK BUTTON TRIGERRING ENGINE (LAST MEIN LAGAYEIN)
 window.onpopstate = function(event) {
+      if (skipPopState === true) {
+        skipPopState = false; // Agli baar ke liye reset karo
+        return; // Chupchaap return ho jao, neche ka HTML logic skip karo!
+    } 
     // 1. Pata karo ki abhi screen par kaun si screen active (khuli) hai
     const currentActiveScreen = document.querySelector('.screen.active')?.id;
 
