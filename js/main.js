@@ -368,6 +368,9 @@ window.onpageshow = function(event) {
     // event.persisted = true ka matlab hai page browser ki history cache se wapas aaya hai
     if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
         initDashboard(); // 🚀 Bina page reload kiye screen ki progress ko automatic update kar dega!
+        window.history.pushState({ activeScreen: 'screen-branches' }, "");
+        window.history.pushState({ activeScreen: 'screen-type-select' }, "");
+        window.history.pushState({ activeScreen: 'screen-quiz-list' }, "");
     }
 };
 // 📱 HARDWARE BACK BUTTON TRIGERRING ENGINE (LAST MEIN LAGAYEIN)
