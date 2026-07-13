@@ -1,4 +1,3 @@
-alert("Main JS Loaded");
 // 📁 1. MASTER DATA STRUCTURE (PRO MODEL)
 const subjectData = {
   samanya_gyan: {
@@ -411,3 +410,18 @@ const nav = performance.getEntriesByType("navigation")[0];
 if (nav && nav.type === "reload") {
     console.log("Page refreshed");
 }
+window.addEventListener("load", () => {
+
+    alert("Load Event");
+
+    const nav = performance.getEntriesByType("navigation");
+
+    alert("Length = " + nav.length);
+
+    if (nav.length > 0) {
+        alert("Type = " + nav[0].type);
+    } else {
+        alert("Navigation API not supported");
+    }
+
+});
