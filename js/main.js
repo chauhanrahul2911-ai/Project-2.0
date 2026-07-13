@@ -408,20 +408,12 @@ window.onpopstate = function(event) {
 const nav = performance.getEntriesByType("navigation")[0];
 
 if (nav && nav.type === "reload") {
-    console.log("Page refreshed");
+    alert("Page refreshed");
 }
 window.addEventListener("load", () => {
+    const nav = performance.getEntriesByType("navigation")[0];
 
-    alert("Load Event");
+    alert(nav.type);
 
-    const nav = performance.getEntriesByType("navigation");
-
-    alert("Length = " + nav.length);
-
-    if (nav.length > 0) {
-        alert("Type = " + nav[0].type);
-    } else {
-        alert("Navigation API not supported");
-    }
-
+    alert(JSON.stringify(history.state));
 });
