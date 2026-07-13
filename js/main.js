@@ -61,6 +61,7 @@ let currentBranch = "";  // Stores English Key (e.g., "gujarat_history")
 let currentType = "";
 let isPremiumUser = (localStorage.getItem('gsrtc_is_premium') === 'true');
 let skipPopState = false;
+let isRestoring = false;
 
 // --- SIDEBAR TOGGLE FUNCTIONS ---
 function toggleSidebar() {
@@ -107,7 +108,9 @@ function changeScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
     window.scrollTo(0,0);
-    window.history.pushState({ activeScreen: screenId }, "");
+    if (!isRestoring) {
+      window.history.pushState({ activeScreen: screenId }, "");
+    }
     
   
 }
@@ -344,7 +347,9 @@ function initDashboard() {
         currentSubject = savedSubject;
         currentBranch = savedBranch;
         currentType = savedType;
-
+      
+        isRestoring = true;
+      
         goToBranchSelect(currentSubject);
         goToTypeSelect(currentBranch);
         goToQuizList(currentType);
@@ -353,6 +358,7 @@ function initDashboard() {
         sessionStorage.removeItem('last_active_subject');
         sessionStorage.removeItem('last_active_branch');
         sessionStorage.removeItem('last_active_type');
+        isRestoring = false;
     }
 }
 
