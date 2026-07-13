@@ -405,3 +405,8 @@ window.onpopstate = function(event) {
     document.getElementById(targetScreen).classList.add('active'); //
     window.scrollTo(0,0); //
 };
+const nav = performance.getEntriesByType("navigation")[0];
+
+if (nav && nav.type === "reload") {
+    console.log("Page refreshed");
+}
