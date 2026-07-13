@@ -8,7 +8,7 @@ const quizNo = urlParams.get('no') || "1";
 
 if (!subject) {
     alert("કોઈ વિષય પસંદ કરેલ નથી! કૃપા કરીને ફરીથી પ્રયાસ કરો.");
-    window.location.href = 'index.html';
+    window.history.back();
 }
 
 const cleanBranchTitle = branch.split('(')[0].trim();
@@ -298,7 +298,7 @@ async function loadQuizDataset() {
         loadQuestion();
     } catch (err) {
         alert("Quiz data file load nahi ho saki! Path check kijiye.");
-        window.location.href = 'index.html';
+        window.history.back();
     }
 }
 
