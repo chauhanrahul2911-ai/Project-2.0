@@ -1,3 +1,4 @@
+alert("Main JS Loaded");
 // 📁 1. MASTER DATA STRUCTURE (PRO MODEL)
 const subjectData = {
   samanya_gyan: {
