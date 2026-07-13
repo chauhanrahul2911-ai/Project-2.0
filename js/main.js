@@ -371,9 +371,9 @@ window.onload = function() {
 // Jab bacha quiz player se hardware back button daba kar aayega, tab ye event fire hoga
 window.onpageshow = function(event) {
     // event.persisted = true ka matlab hai page browser ki history cache se wapas aaya hai
-    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-        initDashboard(); // 🚀 Bina page reload kiye screen ki progress ko automatic update kar dega!
-            }
+    if (isBackForwardNavigation(event)) {
+        initDashboard();
+    }
 };
 // 📱 HARDWARE BACK BUTTON TRIGERRING ENGINE (LAST MEIN LAGAYEIN)
 window.onpopstate = function(event) {
@@ -405,15 +405,25 @@ window.onpopstate = function(event) {
     document.getElementById(targetScreen).classList.add('active'); //
     window.scrollTo(0,0); //
 };
-const nav = performance.getEntriesByType("navigation")[0];
+function isBackForwardNavigation(event) {
 
-if (nav && nav.type === "reload") {
-    alert("Page refreshed");
+    // Modern browsers
+    const nav = performance.getEntriesByType?.("navigation")?.[0];
+    if (nav && nav.type === "back_forward") {
+        return true;
+    }
+
+    // BFCache
+    if (event.persisted) {
+        return true;
+    }
+
+    // Older browsers (fallback)
+    if (window.performance &&
+        window.performance.navigation &&
+        window.performance.navigation.type === 2) {
+        return true;
+    }
+
+    return false;
 }
-window.addEventListener("load", () => {
-    const nav = performance.getEntriesByType("navigation")[0];
-
-    alert(nav.type);
-
-    alert(JSON.stringify(history.state));
-});
