@@ -248,7 +248,7 @@ function showFinalPage() {
 
 function saveAndGoHome() {
     // 🚀 MAGIC LINE: Browser ko bolo sirf ek step peeche chala jaye!
-    window.history.go(-4);
+    window.history.back();
 }
 
 // Absolute Restart Machine
