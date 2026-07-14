@@ -49,7 +49,9 @@ function goToBranchSelect(subjectKey) {
         `;
         container.appendChild(card);
     });
-
+    if (!isRestoring) {
+      sessionStorage.setItem('last_active_subject', currentSubject);
+    }
     changeScreen('screen-branches');
 }
 
@@ -65,7 +67,10 @@ function goToTypeSelect(branchKey) {
     
     document.getElementById('quiz-type-perc').innerText = `Progress: ${quizProg}%`;
     document.getElementById('mock-type-perc').innerText = `Progress: ${mockProg}%`;
-    
+
+    if (!isRestoring) {
+      sessionStorage.setItem('last_active_branch', currentBranch);
+    }
     changeScreen('screen-type-select');
 }
 
@@ -75,7 +80,10 @@ function goToQuizList(type) {
     
     let cleanBranchName = subjectData[currentSubject].branches[currentBranch].gujName;
     document.getElementById('current-list-title').innerText = `${cleanBranchName} - ${type}`;
-    
+
+    if (!isRestoring) {
+      sessionStorage.setItem('last_active_type', currentType);
+    }
     buildQuizRows();
     changeScreen('screen-quiz-list');
 }
