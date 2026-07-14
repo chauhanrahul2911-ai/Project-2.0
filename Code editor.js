@@ -19,7 +19,66 @@ function buildSubjectCards() {
         container.appendChild(card);
     });
 }
+function goToBranchSelect(subjectKey) {
+    currentSubject = subjectKey;
+    
+    let cleanSubjectName = subjectData[subjectKey].gujName;
+    document.getElementById('current-subject-title-branch').innerText = cleanSubjectName;
+    
+    const container = document.getElementById('branches-container');
+    container.innerHTML = "";
 
+    const branches = Object.keys(subjectData[subjectKey].branches);
+    
+    branches.forEach((branchKey, index) => {
+        let qProg = getBranchProgress(subjectKey, branchKey, 'Quiz');
+        let mProg = getBranchProgress(subjectKey, branchKey, 'Mock Test');
+        let branchProgress = Math.round((qProg + mProg) / 2) || 0;
+
+        let cleanBranchName = subjectData[subjectKey].branches[branchKey].gujName;
+
+        const card = document.createElement('div');
+        card.className = "card";
+        card.onclick = () => goToTypeSelect(branchKey); 
+        card.innerHTML = `
+            <div>
+                <div>${index + 1}. ${cleanBranchName}</div>
+                <span class="sub-perc">કુલ પ્રગતિ: ${branchProgress}%</span>
+            </div>
+            <span>➔</span>
+        `;
+        container.appendChild(card);
+    });
+
+    changeScreen('screen-branches');
+}
+
+// --- ⚡ TYPE SELECT INTERMEDIARY (Screen 3) ---
+function goToTypeSelect(branchKey) {
+    currentBranch = branchKey;
+    
+    let cleanBranchName = subjectData[currentSubject].branches[branchKey].gujName;
+    document.getElementById('current-subject-name').innerText = cleanBranchName;
+    
+    let quizProg = getBranchProgress(currentSubject, branchKey, 'Quiz');
+    let mockProg = getBranchProgress(currentSubject, branchKey, 'Mock Test');
+    
+    document.getElementById('quiz-type-perc').innerText = `Progress: ${quizProg}%`;
+    document.getElementById('mock-type-perc').innerText = `Progress: ${mockProg}%`;
+    
+    changeScreen('screen-type-select');
+}
+
+// --- 📋 DYNAMIC QUIZ ROWS GENERATOR (Screen 4) ---
+function goToQuizList(type) {
+    currentType = type;
+    
+    let cleanBranchName = subjectData[currentSubject].branches[currentBranch].gujName;
+    document.getElementById('current-list-title').innerText = `${cleanBranchName} - ${type}`;
+    
+    buildQuizRows();
+    changeScreen('screen-quiz-list');
+}
 function initDashboard() {
     updateProfileUI();
     buildSubjectCards();
