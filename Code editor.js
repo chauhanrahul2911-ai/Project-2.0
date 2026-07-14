@@ -25,3 +25,16 @@ function initDashboard() {
         isRestoring = false;
     }
 }
+// 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
+window.onload = function() {
+    initDashboard();
+};
+
+// 📱 Case 2: HARDWARE BACK BUTTON PROTECTION ENGINE
+// Jab bacha quiz player se hardware back button daba kar aayega, tab ye event fire hoga
+window.onpageshow = function(event) {
+    // event.persisted = true ka matlab hai page browser ki history cache se wapas aaya hai
+    if (isBackForwardNavigation(event)) {
+        initDashboard();
+    }
+};
