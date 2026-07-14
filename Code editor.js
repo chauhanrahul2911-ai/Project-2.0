@@ -38,3 +38,32 @@ window.onpageshow = function(event) {
         initDashboard();
     }
 };
+window.onpopstate = function(event) {
+      if (skipPopState === true) {
+        skipPopState = false; // Agli baar ke liye reset karo
+        return; // Chupchaap return ho jao, neche ka HTML logic skip karo!
+    } 
+    // 1. Pata karo ki abhi screen par kaun si screen active (khuli) hai
+    const currentActiveScreen = document.querySelector('.screen.active')?.id;
+
+    // 2. Agar bacha sabse pehli screen (Subject List) par hai, toh call hi mat karo (browser website se exit ho jayega)
+    if (currentActiveScreen === 'screen-subjects') {
+        return; 
+    }
+
+    // 3. 🔥 AAPKA LOGIC: Current screen ke hisab se target screen chuniyen
+    let targetScreen = 'screen-subjects';
+
+    if (currentActiveScreen === 'screen-quiz-list') {
+        targetScreen = 'screen-type-select'; // Quiz list se peeche Type Select
+    } else if (currentActiveScreen === 'screen-type-select') {
+        targetScreen = 'screen-branches';    // Type Select se peeche Branch Select
+    } else if (currentActiveScreen === 'screen-branches') {
+        targetScreen = 'screen-subjects';    // Branch Select se peeche Subject List
+    }
+
+    // 4. 🔥 DIRECT HTML MANIPULATION (Bina pushState ko chhede)
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); //
+    document.getElementById(targetScreen).classList.add('active'); //
+    window.scrollTo(0,0); //
+};
