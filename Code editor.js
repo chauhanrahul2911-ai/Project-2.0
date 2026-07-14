@@ -1,3 +1,7 @@
+let savedSubject = '';
+let savedBranch = '';
+let savedType = '';
+
 function buildSubjectCards() {
     const container = document.getElementById('subjects-container');
     container.innerHTML = "";
@@ -92,9 +96,9 @@ function initDashboard() {
     buildSubjectCards();
 
     // 🔄 Pure memory system ko sessionStorage par shift kar diya hai
-    const savedSubject = sessionStorage.getItem('last_active_subject');
-    const savedBranch = sessionStorage.getItem('last_active_branch');
-    const savedType = sessionStorage.getItem('last_active_type');
+    savedSubject = sessionStorage.getItem('last_active_subject');
+    savedBranch = sessionStorage.getItem('last_active_branch');
+    savedType = sessionStorage.getItem('last_active_type');
 
     if (savedSubject && savedBranch && savedType) {
         currentSubject = savedSubject;
@@ -107,10 +111,27 @@ function initDashboard() {
         goToTypeSelect(currentBranch);
         goToQuizList(currentType);
 
-        // 🔥 Magic Line: Turant memory saaf taaki background kill aur refresh sahi chale!
-        sessionStorage.removeItem('last_active_subject');
-        sessionStorage.removeItem('last_active_branch');
-        sessionStorage.removeItem('last_active_type');
+        
+        isRestoring = false;
+    }
+    else if (savedSubject && savedBranch) {
+        currentSubject = savedSubject;
+        currentBranch = savedBranch;
+      
+        isRestoring = true;
+      
+        goToBranchSelect(currentSubject);
+        goToTypeSelect(currentBranch);
+
+        isRestoring = false;
+    }
+    else if (savedSubject) {
+        currentSubject = savedSubject;
+    
+        isRestoring = true;
+      
+        goToBranchSelect(currentSubject);
+
         isRestoring = false;
     }
 }
@@ -132,6 +153,15 @@ window.onpopstate = function(event) {
         skipPopState = false; // Agli baar ke liye reset karo
         return; // Chupchaap return ho jao, neche ka HTML logic skip karo!
     } 
+    if (savedSubject && savedBranch && savedType) {
+        sessionStorage.removeItem('last_active_type');
+    }
+    else if (savedSubject && savedBranch) {
+        sessionStorage.removeItem('last_active_branch');
+    }
+    else if (savedSubject) {
+        sessionStorage.removeItem('last_active_subject');
+    }
     // 1. Pata karo ki abhi screen par kaun si screen active (khuli) hai
     const currentActiveScreen = document.querySelector('.screen.active')?.id;
 
@@ -156,3 +186,7 @@ window.onpopstate = function(event) {
     document.getElementById(targetScreen).classList.add('active'); //
     window.scrollTo(0,0); //
 };
+// 🔥 Magic Line: Turant memory saaf taaki background kill aur refresh sahi chale!
+        
+        
+        
