@@ -1,3 +1,25 @@
+function buildSubjectCards() {
+    const container = document.getElementById('subjects-container');
+    container.innerHTML = "";
+
+    syllabusSubjects.forEach((subKey, index) => {
+        let progress = getSubjectProgress(subKey);
+        let gujSubjectName = subjectData[subKey].gujName; // Gujarati Text Display
+
+        const card = document.createElement('div');
+        card.className = "card";
+        card.onclick = () => goToBranchSelect(subKey); 
+        card.innerHTML = `
+            <div>
+                <div>${index + 1}. ${gujSubjectName}</div>
+                <span class="sub-perc">કુલ પ્રગતિ: ${progress}%</span>
+            </div>
+            <span>➔</span>
+        `;
+        container.appendChild(card);
+    });
+}
+
 function initDashboard() {
     updateProfileUI();
     buildSubjectCards();
