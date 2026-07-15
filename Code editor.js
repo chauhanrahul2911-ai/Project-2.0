@@ -1,3 +1,4 @@
+let activeScreen = '';
 function buildSubjectCards() {
     const container = document.getElementById('subjects-container');
     container.innerHTML = "";
@@ -55,6 +56,18 @@ function goToBranchSelect(subjectKey) {
     changeScreen('screen-branches');
 }
 
+function changeScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    window.scrollTo(0,0);
+    if (!isRestoring) {
+      window.history.pushState({ activeScreen: screenId }, "");
+      activeScreen = screenId;
+    }
+    
+  
+}
+
 // --- ⚡ TYPE SELECT INTERMEDIARY (Screen 3) ---
 function goToTypeSelect(branchKey) {
     currentBranch = branchKey;
@@ -91,46 +104,43 @@ function initDashboard() {
     updateProfileUI();
     buildSubjectCards();
 
-    // 🔄 Pure memory system ko sessionStorage par shift kar diya hai
-    savedSubject = sessionStorage.getItem('last_active_subject');
-    savedBranch = sessionStorage.getItem('last_active_branch');
-    savedType = sessionStorage.getItem('last_active_type');
-
-    if (savedSubject && savedBranch && savedType) {
-        currentSubject = savedSubject;
-        currentBranch = savedBranch;
-        currentType = savedType;
-      
-        isRestoring = true;
-      
-        goToBranchSelect(currentSubject);
-        goToTypeSelect(currentBranch);
-        goToQuizList(currentType);
-
+    if (activeScreen === "screen-quiz-list) {
         
-        isRestoring = false;
-    }
-    else if (savedSubject && savedBranch) {
-        currentSubject = savedSubject;
-        currentBranch = savedBranch;
-      
         isRestoring = true;
       
-        goToBranchSelect(currentSubject);
-        goToTypeSelect(currentBranch);
+        goToBranchSelect(sessionStorage.getItem('last_active_subject'));
+        goToTypeSelect(sessionStorage.getItem('last_active_branch'));
+        goToQuizList(sessionStorage.getItem('last_active_type'));
 
         isRestoring = false;
+
+        activeScreen = history.state?.activeScreen;
     }
-    else if (savedSubject) {
-        currentSubject = savedSubject;
-    
+    else if (activeScreen === "screen-type-select") {
         isRestoring = true;
       
-        goToBranchSelect(currentSubject);
+        goToBranchSelect(sessionStorage.getItem('last_active_subject'));
+        goToTypeSelect(sessionStorage.getItem('last_active_branch'));
 
         isRestoring = false;
+
+        activeScreen = history.state?.activeScreen;
+    }
+    else if (activeScreen === "screen-branches") {
+        isRestoring = true;
+      
+        goToBranchSelect(sessionStorage.getItem('last_active_subject'));
+
+        isRestoring = false;
+
+        activeScreen = history.state?.activeScreen;
+    }
+    else {
+        return;
     }
 }
+    
+
 // 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
 window.onload = function() {
     initDashboard();
@@ -149,15 +159,7 @@ window.onpopstate = function(event) {
         skipPopState = false; // Agli baar ke liye reset karo
         return; // Chupchaap return ho jao, neche ka HTML logic skip karo!
     } 
-    if (savedSubject && savedBranch && savedType) {
-        sessionStorage.removeItem('last_active_type');
-    }
-    else if (savedSubject && savedBranch) {
-        sessionStorage.removeItem('last_active_branch');
-    }
-    else if (savedSubject) {
-        sessionStorage.removeItem('last_active_subject');
-    }
+    
     // 1. Pata karo ki abhi screen par kaun si screen active (khuli) hai
     const currentActiveScreen = document.querySelector('.screen.active')?.id;
 
