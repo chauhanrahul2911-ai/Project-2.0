@@ -218,7 +218,9 @@ function goToBranchSelect(subjectKey) {
         `;
         container.appendChild(card);
     });
-
+    if (!isRestoring) {
+      sessionStorage.setItem('last_active_subject', currentSubject);
+    }
     changeScreen('screen-branches');
 }
 
@@ -234,7 +236,9 @@ function goToTypeSelect(branchKey) {
     
     document.getElementById('quiz-type-perc').innerText = `Progress: ${quizProg}%`;
     document.getElementById('mock-type-perc').innerText = `Progress: ${mockProg}%`;
-    
+    if (!isRestoring) {
+      sessionStorage.setItem('last_active_branch', currentBranch);
+    }
     changeScreen('screen-type-select');
 }
 
@@ -244,7 +248,9 @@ function goToQuizList(type) {
     
     let cleanBranchName = subjectData[currentSubject].branches[currentBranch].gujName;
     document.getElementById('current-list-title').innerText = `${cleanBranchName} - ${type}`;
-    
+    if (!isRestoring) {
+      sessionStorage.setItem('last_active_type', currentType);
+    }
     buildQuizRows();
     changeScreen('screen-quiz-list');
 }
@@ -321,31 +327,42 @@ function simulatePayment() {
 // --- ⚙️ ENTRY STARTUP INITS (RE-ENGINEERED FOR SESSIONSTORAGE & AUTO-REFRESH) ---
 
 function initDashboard() {
+
     updateProfileUI();
     buildSubjectCards();
 
-    // 🔄 Pure memory system ko sessionStorage par shift kar diya hai
-    const savedSubject = sessionStorage.getItem('last_active_subject');
-    const savedBranch = sessionStorage.getItem('last_active_branch');
-    const savedType = sessionStorage.getItem('last_active_type');
+    const lastScreen = history.state?.activeScreen;
 
-    if (savedSubject && savedBranch && savedType) {
-        currentSubject = savedSubject;
-        currentBranch = savedBranch;
-        currentType = savedType;
-      
-        isRestoring = true;
-      
-        goToBranchSelect(currentSubject);
-        goToTypeSelect(currentBranch);
-        goToQuizList(currentType);
-
-        // 🔥 Magic Line: Turant memory saaf taaki background kill aur refresh sahi chale!
-        sessionStorage.removeItem('last_active_subject');
-        sessionStorage.removeItem('last_active_branch');
-        sessionStorage.removeItem('last_active_type');
-        isRestoring = false;
+    if (!lastScreen) {
+        return;
     }
+
+    const savedSubject = sessionStorage.getItem("last_active_subject");
+    const savedBranch = sessionStorage.getItem("last_active_branch");
+    const savedType = sessionStorage.getItem("last_active_type");
+
+    isRestoring = true;
+
+    if (lastScreen === "screen-branches") {
+
+        goToBranchSelect(savedSubject);
+
+    }
+    else if (lastScreen === "screen-type-select") {
+
+        goToBranchSelect(savedSubject);
+        goToTypeSelect(savedBranch);
+
+    }
+    else if (lastScreen === "screen-quiz-list") {
+
+        goToBranchSelect(savedSubject);
+        goToTypeSelect(savedBranch);
+        goToQuizList(savedType);
+
+    }
+
+    isRestoring = false;
 }
 
 // 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
