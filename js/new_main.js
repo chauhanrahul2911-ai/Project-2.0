@@ -409,6 +409,7 @@ function isBackForwardNavigation(event) {
 }
 // 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
 window.onload = function(event) {
+    initDashboard();
     history.replaceState(
     { activeScreen: "screen-subjects" }, "");
 };
