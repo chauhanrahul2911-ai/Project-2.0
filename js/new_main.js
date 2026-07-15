@@ -365,48 +365,25 @@ function initDashboard() {
     isRestoring = false;
 }
 
-// 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
-window.onload = function() {
-    initDashboard();
-};
-
-// 📱 Case 2: HARDWARE BACK BUTTON PROTECTION ENGINE
-// Jab bacha quiz player se hardware back button daba kar aayega, tab ye event fire hoga
-window.onpageshow = function(event) {
-    // event.persisted = true ka matlab hai page browser ki history cache se wapas aaya hai
-    if (isBackForwardNavigation(event)) {
-        initDashboard();
-    }
-};
 // 📱 HARDWARE BACK BUTTON TRIGERRING ENGINE (LAST MEIN LAGAYEIN)
-window.onpopstate = function(event) {
-      if (skipPopState === true) {
-        skipPopState = false; // Agli baar ke liye reset karo
-        return; // Chupchaap return ho jao, neche ka HTML logic skip karo!
-    } 
-    // 1. Pata karo ki abhi screen par kaun si screen active (khuli) hai
-    const currentActiveScreen = document.querySelector('.screen.active')?.id;
+window.onpopstate = function () {
+    // Browser history se current screen nikalo
+    const lastScreen = history.state?.activeScreen;
 
-    // 2. Agar bacha sabse pehli screen (Subject List) par hai, toh call hi mat karo (browser website se exit ho jayega)
-    if (currentActiveScreen === 'screen-subjects') {
-        return; 
+    // Agar history me koi screen nahi hai to browser ko normal back handle karne do
+    if (!lastScreen) {
+        return;
     }
 
-    // 3. 🔥 AAPKA LOGIC: Current screen ke hisab se target screen chuniyen
-    let targetScreen = 'screen-subjects';
+    // Sab screens hide karo
+    document.querySelectorAll(".screen").forEach(screen => {
+        screen.classList.remove("active");
+    });
 
-    if (currentActiveScreen === 'screen-quiz-list') {
-        targetScreen = 'screen-type-select'; // Quiz list se peeche Type Select
-    } else if (currentActiveScreen === 'screen-type-select') {
-        targetScreen = 'screen-branches';    // Type Select se peeche Branch Select
-    } else if (currentActiveScreen === 'screen-branches') {
-        targetScreen = 'screen-subjects';    // Branch Select se peeche Subject List
-    }
+    // Browser history wali screen dikhao
+    document.getElementById(lastScreen).classList.add("active");
 
-    // 4. 🔥 DIRECT HTML MANIPULATION (Bina pushState ko chhede)
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); //
-    document.getElementById(targetScreen).classList.add('active'); //
-    window.scrollTo(0,0); //
+    window.scrollTo(0, 0);
 };
 function isBackForwardNavigation(event) {
 
@@ -430,3 +407,15 @@ function isBackForwardNavigation(event) {
 
     return false;
 }
+// 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
+window.onload = function(event) {
+    if (!isBackForwardNavigation(event)) {
+        initDashboard();
+    }
+};
+
+window.onpageshow = function(event) {
+    if (isBackForwardNavigation(event)) {
+        initDashboard();
+    }
+};
