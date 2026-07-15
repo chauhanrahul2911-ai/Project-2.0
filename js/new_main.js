@@ -333,8 +333,8 @@ function initDashboard() {
 
     const lastScreen = history.state?.activeScreen;
 
-    if (!lastScreen) {
-        return;
+    if (lastScreen === "screen-subjects") {
+      return;
     }
 
     const savedSubject = sessionStorage.getItem("last_active_subject");
