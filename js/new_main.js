@@ -370,11 +370,6 @@ window.onpopstate = function () {
     // Browser history se current screen nikalo
     const lastScreen = history.state?.activeScreen;
 
-    // Agar history me koi screen nahi hai to browser ko normal back handle karne do
-    if (!lastScreen) {
-        return;
-    }
-
     // Sab screens hide karo
     document.querySelectorAll(".screen").forEach(screen => {
         screen.classList.remove("active");
@@ -417,6 +412,7 @@ window.onload = function(event) {
 
 window.onpageshow = function(event) {
     if (isBackForwardNavigation(event)) {
+      
         initDashboard();
     }
 };
