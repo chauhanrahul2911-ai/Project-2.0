@@ -1,7 +1,3 @@
-let savedSubject = '';
-let savedBranch = '';
-let savedType = '';
-
 function buildSubjectCards() {
     const container = document.getElementById('subjects-container');
     container.innerHTML = "";
@@ -187,6 +183,17 @@ window.onpopstate = function(event) {
     window.scrollTo(0,0); //
 };
 // 🔥 Magic Line: Turant memory saaf taaki background kill aur refresh sahi chale!
-        
+if (history.state?.activeScreen === "screen-quiz-list") {
+    // Quiz List restore karo
+}
+else if (history.state?.activeScreen === "screen-type-select") {
+    // Type Select restore karo
+}
+else if (history.state?.activeScreen === "screen-branches") {
+    // Branch restore karo
+}
+else {
+    // Subject screen
+}        
         
         
