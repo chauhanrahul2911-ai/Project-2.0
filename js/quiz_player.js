@@ -173,11 +173,21 @@ function handleChoice(idx) {
 }
 
 // Explanations View Trigger
+// ⚙️ quiz_player.js mein sirf is ek function ko badalna hai:
 function openExplain() {
     playSnd('snd-click');
     var data = quizData[currentIdx];
-    document.getElementById('explain-text').innerText = data.explanation || "No explanation available.";
-    document.getElementById('explainModal').style.display = 'flex';
+    
+    // 🎯 MASTER CHECK: Agar JSON mein explain_img di hai, to direct use Zoom Modal mein full screen kholo
+    if (data.explain_img) {
+        document.getElementById('fullImg').src = data.explain_img;
+        document.getElementById('zoomModal').style.display = 'flex';
+    } 
+    // 📝 Fallback: Agar sirf text hai, to purana normal text modal kholo
+    else if (data.explanation) {
+        document.getElementById('explain-text').innerText = data.explanation;
+        document.getElementById('explainModal').style.display = 'flex';
+    }
 }
 function closeExplain() { 
     document.getElementById('explainModal').style.display = 'none'; 
