@@ -287,10 +287,6 @@ function buildQuizRows() {
                     loginWithGoogle();
                 } else { openPaywall(); }
             } else {
-                // Session tracking variables sync back logic
-                sessionStorage.setItem('last_active_subject', currentSubject);
-                sessionStorage.setItem('last_active_branch', currentBranch);
-                sessionStorage.setItem('last_active_type', currentType);
 
                 // 🎯 100% SATEEK DATA EXTRACTION: Bina kisi mismatch ke English & Gujarati values separate bhejega
                 let branchFolder = currentBranch; // English path parameter e.g., "gujarat_history"
@@ -333,7 +329,7 @@ function initDashboard() {
 
     const lastScreen = history.state?.activeScreen;
 
-    if (lastScreen === "screen-subjects") {
+    if (!lastScreen || lastScreen === "screen-subjects") {
       return;
     }
 
@@ -370,6 +366,9 @@ window.onpopstate = function () {
     // Browser history se current screen nikalo
     const lastScreen = history.state?.activeScreen;
 
+    // 🎯 SAFETY GUARD: Agar state null hai (exit time), toh yahi se ruk jao
+    if (!lastScreen) return;
+  
     // Sab screens hide karo
     document.querySelectorAll(".screen").forEach(screen => {
         screen.classList.remove("active");
@@ -412,7 +411,6 @@ window.onload = function(event) {
 
 window.onpageshow = function(event) {
     if (isBackForwardNavigation(event)) {
-      
         initDashboard();
     }
 };
