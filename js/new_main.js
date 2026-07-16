@@ -70,19 +70,15 @@ function toggleSidebar() {
 
 function changeScreenFromSidebar() {
 
-    const currentScreen = history.state?.activeScreen;
+    const screens = [
+        "screen-subjects",
+        "screen-branches",
+        "screen-type-select",
+        "screen-quiz-list"
+    ];
 
-    let steps = 0;
-
-    if (currentScreen === "screen-quiz-list") {
-        steps = 3;
-    }
-    else if (currentScreen === "screen-type-select") {
-        steps = 2;
-    }
-    else if (currentScreen === "screen-branches") {
-        steps = 1;
-    }
+    const currentScreen = history.state.activeScreen;
+    const steps = screens.indexOf(currentScreen);
 
     if (steps > 0) {
         history.go(-steps);
