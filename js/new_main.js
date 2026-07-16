@@ -284,10 +284,9 @@ function buildQuizRows() {
                 } else { openPaywall(); }
             } else {
 
-                // 🎯 100% SATEEK DATA EXTRACTION: Bina kisi mismatch ke English & Gujarati values separate bhejega
-                let branchFolder = currentBranch; // English path parameter e.g., "gujarat_history"
-                
-                window.location.href = `quiz_player.html?subject=${currentSubject}&branch=${encodeURIComponent(branchGujName)}&branchFolder=${branchFolder}&type=${encodeURIComponent(currentType)}&no=${i}`;
+                sessionStorage.setItem('last_active_branch_guj', branchGujName); 
+                sessionStorage.setItem('last_active_quiz_no', i);         
+                window.location.href = `quiz_player.html`;            
             }
         };
         container.appendChild(row);
