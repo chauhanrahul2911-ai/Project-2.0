@@ -1,10 +1,9 @@
-// URL Parameters parsing logic
-const urlParams = new URLSearchParams(window.location.search);
-const subject = urlParams.get('subject'); 
-const branch = decodeURIComponent(urlParams.get('branch')) || ""; 
-const branchFolder = urlParams.get('branchFolder') || ""; 
-const type = urlParams.get('type') || "Quiz";
-const quizNo = urlParams.get('no') || "1";
+// 🚀 NEW SESSIONSTORAGE PARSING ENGINE ✅
+const subject      = sessionStorage.getItem('last_active_subject'); 
+const branch       = sessionStorage.getItem('last_active_branch_guj') || ""; 
+const branchFolder = sessionStorage.getItem('last_active_branch') || ""; 
+const type         = sessionStorage.getItem('last_active_type') || "Quiz";
+const quizNo       = sessionStorage.getItem('last_active_quiz_no') || "1";
 
 if (!subject) {
     alert("કોઈ વિષય પસંદ કરેલ નથી! કૃપા કરીને ફરીથી પ્રયાસ કરો.");
