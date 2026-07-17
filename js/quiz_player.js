@@ -75,12 +75,12 @@ function loadQuestion() {
     const backBtn = document.getElementById('back-btn');
     const explainBtn = document.getElementById('explain-btn');
     
-    // 🎯 UPGRADE: Next button normal test mein chhupa rahega jab tak answer na de, par Review mein hamesha dikhega
+    // Next button control
     nextBtn.style.display = isReview ? 'block' : 'none';
     explainBtn.style.display = 'none';
     document.getElementById('review-tag').style.display = isReview ? 'block' : 'none';
     
-    // 🎯 BACK BUTTON LOCK UPGRADE: Ab normal test HO ya Review mode, bacha hamesha back ja sakta hai!
+    // Back navigation active in both modes
     if (backBtn) {
         backBtn.style.display = (currentIdx > 0) ? 'block' : 'none';
     }
@@ -124,7 +124,6 @@ function loadQuestion() {
         btn.style.display = 'block'; 
         btn.disabled = isReview;
         
-        // 🎯 normal mode mein agar pehle se jawab diya hua hai (due to refresh or back navigation)
         if(!isReview && userChoices[currentIdx] !== undefined) {
             answered = true;
             nextBtn.style.display = 'block';
@@ -134,7 +133,6 @@ function loadQuestion() {
             btn.disabled = true;
         }
 
-        // 🎯 REVIEW MODE UPGRADE: Jawab dikhao aur agar explanation data hai toh direct 💡 button show karo!
         if(isReview) {
             if(i === data.correct) btn.classList.add('correct');
             if(userChoices[currentIdx] === i && i !== data.correct) btn.classList.add('wrong');
@@ -148,7 +146,6 @@ function handleBackQuestion() {
     if (currentIdx > 0) {
         playSnd('snd-click');
         
-        // Normal test mein score adjustments
         if (!isReview) {
             var correct = quizData[currentIdx - 1].correct;
             if(userChoices[currentIdx - 1] === correct && score > 0) {
@@ -183,7 +180,7 @@ function handleChoice(idx) {
     }
     
     document.getElementById('score-display').innerText = "Score: " + score;
-    backupCurrentState(); // Instant save score on selection
+    backupCurrentState();
     
     if(quizData[currentIdx].explanation || quizData[currentIdx].explain_img) { 
         document.getElementById('explain-btn').style.display = 'block'; 
@@ -230,10 +227,9 @@ function handleNext() {
         clearInterval(timerInterval); 
         if(!isReview) { 
             autoSaveScore(); 
-            clearQuizSession(); // Quiz submit hote hi state khatam
+            clearQuizSession(); 
             showFinalPage();
         } else {
-            // Review finish hone par dobara result pane par laao
             clearQuizSession();
             showFinalPage();
         }
@@ -249,7 +245,6 @@ function autoSaveScore() {
     localStorage.setItem(scoreKey, finalPercent);
 }
 
-// Clear Session States
 function clearQuizSession() {
     sessionStorage.removeItem('quiz_current_idx');
     sessionStorage.removeItem('quiz_current_score');
@@ -258,7 +253,6 @@ function clearQuizSession() {
     sessionStorage.removeItem('quiz_is_review');
 }
 
-// Show Final Performance Screen
 function showFinalPage() {
     playSnd('snd-finish');
     document.getElementById('game-ui').style.display = 'none';
@@ -307,6 +301,7 @@ function restartQuizFresh() {
     loadQuestion();
 }
 
+// Review mode kickstart
 function startReview() { 
     playSnd('snd-click'); 
     isReview = true; 
@@ -326,50 +321,20 @@ function closeZoom() {
     document.getElementById('zoomModal').style.display = 'none'; 
 }
 
-// Initial Kickstart
+// Initial Fetch Kickstart Engine
 async function loadQuizDataset() {
     try {
         const response = await fetch(`data/${subject}/${branchFolder}/${type}_${quizNo}.json?v=${new Date().getTime()}`);
         if(!response.ok) throw new Error("File not found");
         quizData = await response.json();
         
-        // Agar pehle se test chal rha tha to countdown aur loader wahi se pakdega
         startCountdown();
         loadQuestion();
         
-        // Agar bacha pehle hi quiz khatam kar chuka tha aur tab refresh kiya, to direct end view
         if(sessionStorage.getItem('quiz_current_idx') === null && userChoices.length >= quizData.length) {
              clearInterval(timerInterval);
              showFinalPage();
         }
-    } catch (err) {
-        alert("Quiz data file load nahi ho saki! Path check kijiye.");
-        window.history.back();
-    }
-}
-
-loadQuizDataset();al-ui').style.display = 'none'; 
-    loadQuestion(); 
-}
-
-function openZoom() { 
-    playSnd('snd-click'); 
-    document.getElementById('fullImg').src = document.getElementById('q-image').src; 
-    document.getElementById('zoomModal').style.display = 'flex'; 
-}
-function closeZoom() { 
-    document.getElementById('zoomModal').style.display = 'none'; 
-}
-
-// Initial Kickstart
-async function loadQuizDataset() {
-    try {
-        const response = await fetch(`data/${subject}/${branchFolder}/${type}_${quizNo}.json?v=${new Date().getTime()}`);
-        if(!response.ok) throw new Error("File not found");
-        quizData = await response.json();
-        
-        startCountdown();
-        loadQuestion();
     } catch (err) {
         alert("Quiz data file load nahi ho saki! Path check kijiye.");
         window.history.back();
