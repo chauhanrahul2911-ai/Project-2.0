@@ -13,13 +13,14 @@ if (!subject) {
 const cleanBranchTitle = branch.split('(')[0].trim();
 document.getElementById('quiz-title').innerText = `${cleanBranchTitle} - ${type} ${quizNo}`;
 
+// 🎯 REFRESH LOCK ENGINE: Session se state uthao ya zero se shuru karo
 var quizData = []; 
-var currentIdx = 0; 
-var score = 0; 
+var currentIdx = parseInt(sessionStorage.getItem('quiz_current_idx')) || 0; 
+var score = parseInt(sessionStorage.getItem('quiz_current_score')) || 0; 
 var answered = false;
-var timeLeft = 600; 
-var isReview = false; 
-var userChoices = [];
+var timeLeft = parseInt(sessionStorage.getItem('quiz_time_left')) || 600; 
+var isReview = sessionStorage.getItem('quiz_is_review') === 'true'; 
+var userChoices = JSON.parse(sessionStorage.getItem('quiz_user_choices')) || [];
 var isMuted = false; 
 var timerInterval;
 
@@ -44,6 +45,7 @@ function startCountdown() {
     timerInterval = setInterval(function() {
         if(isReview) return;
         timeLeft--;
+        sessionStorage.setItem('quiz_time_left', timeLeft); // Save time on every tick
         var mins = Math.floor(timeLeft / 60); 
         var secs = timeLeft % 60;
         document.getElementById('timer-display').innerText = "⌛ " + (mins < 10 ? "0"+mins : mins) + ":" + (secs < 10 ? "0"+secs : secs);
@@ -55,36 +57,44 @@ function startCountdown() {
     }, 1000);
 }
 
+// State Backup Helper
+function backupCurrentState() {
+    sessionStorage.setItem('quiz_current_idx', currentIdx);
+    sessionStorage.setItem('quiz_current_score', score);
+    sessionStorage.setItem('quiz_user_choices', JSON.stringify(userChoices));
+    sessionStorage.setItem('quiz_is_review', isReview);
+}
+
 // Core Question Loader Block
 function loadQuestion() {
     answered = false;
     window.scrollTo(0, 0);
+    backupCurrentState(); // Backup state on question load
 
     const nextBtn = document.getElementById('next-btn');
     const backBtn = document.getElementById('back-btn');
     const explainBtn = document.getElementById('explain-btn');
     
+    // 🎯 UPGRADE: Next button normal test mein chhupa rahega jab tak answer na de, par Review mein hamesha dikhega
     nextBtn.style.display = isReview ? 'block' : 'none';
     explainBtn.style.display = 'none';
     document.getElementById('review-tag').style.display = isReview ? 'block' : 'none';
     
-    // Back navigation visual lock rules
+    // 🎯 BACK BUTTON LOCK UPGRADE: Ab normal test HO ya Review mode, bacha hamesha back ja sakta hai!
     if (backBtn) {
-        backBtn.style.display = (currentIdx > 0 && !isReview) ? 'block' : 'none';
+        backBtn.style.display = (currentIdx > 0) ? 'block' : 'none';
     }
 
     if (currentIdx === quizData.length - 1) {
-        nextBtn.innerText = "Submit";
+        nextBtn.innerText = isReview ? "Finish Review" : "Submit";
     } else {
         nextBtn.innerText = "Next ➔";
     }
 
-    // 🎯 DYNAMIC LIFELINE ENGINE: Har question par check karega aur strict state maintain karega
+    // Dynamic Lifeline Logic
     var lifelineBtn = document.getElementById('fifty-fifty');
     if (lifelineBtn) {
         lifelineBtn.style.display = isReview ? 'none' : 'block';
-        
-        // 🔒 Back button protection: Agar jawab pehle se saved hai ya review hai, toh locked, warna hamesha free active!
         if (isReview || userChoices[currentIdx] !== undefined) {
             lifelineBtn.disabled = true;
         } else {
@@ -93,6 +103,7 @@ function loadQuestion() {
     }
 
     document.getElementById('progress-text').innerText = "Question " + (currentIdx + 1) + " of " + quizData.length;
+    document.getElementById('score-display').innerText = "Score: " + score;
     
     var data = quizData[currentIdx];
     document.getElementById('question').innerText = data.q;
@@ -113,33 +124,40 @@ function loadQuestion() {
         btn.style.display = 'block'; 
         btn.disabled = isReview;
         
+        // 🎯 normal mode mein agar pehle se jawab diya hua hai (due to refresh or back navigation)
         if(!isReview && userChoices[currentIdx] !== undefined) {
             answered = true;
             nextBtn.style.display = 'block';
-            if(quizData[currentIdx].explanation || quizData[currentIdx].explain_img) explainBtn.style.display = 'block';
+            if(data.explanation || data.explain_img) explainBtn.style.display = 'block';
             if(i === data.correct) btn.classList.add('correct');
             if(userChoices[currentIdx] === i && i !== data.correct) btn.classList.add('wrong');
             btn.disabled = true;
         }
 
+        // 🎯 REVIEW MODE UPGRADE: Jawab dikhao aur agar explanation data hai toh direct 💡 button show karo!
         if(isReview) {
             if(i === data.correct) btn.classList.add('correct');
             if(userChoices[currentIdx] === i && i !== data.correct) btn.classList.add('wrong');
+            if(data.explanation || data.explain_img) explainBtn.style.display = 'block';
         }
     });
 }
 
 // Back Navigation Processor
 function handleBackQuestion() {
-    if (currentIdx > 0 && !isReview) {
+    if (currentIdx > 0) {
         playSnd('snd-click');
-        var correct = quizData[currentIdx - 1].correct;
-        if(userChoices[currentIdx - 1] === correct && score > 0) {
-            score--;
+        
+        // Normal test mein score adjustments
+        if (!isReview) {
+            var correct = quizData[currentIdx - 1].correct;
+            if(userChoices[currentIdx - 1] === correct && score > 0) {
+                score--;
+            }
         }
+        
         currentIdx--;
         loadQuestion();
-        document.getElementById('score-display').innerText = "Score: " + score;
     }
 }
 
@@ -151,7 +169,6 @@ function handleChoice(idx) {
     var correct = quizData[currentIdx].correct;
     var btns = document.querySelectorAll('.option-btn');
     
-    // Answer dete hi lifeline immediate disabled ho jani chahiye
     var lifelineBtn = document.getElementById('fifty-fifty');
     if(lifelineBtn) lifelineBtn.disabled = true;
     
@@ -166,6 +183,8 @@ function handleChoice(idx) {
     }
     
     document.getElementById('score-display').innerText = "Score: " + score;
+    backupCurrentState(); // Instant save score on selection
+    
     if(quizData[currentIdx].explanation || quizData[currentIdx].explain_img) { 
         document.getElementById('explain-btn').style.display = 'block'; 
     }
@@ -173,18 +192,13 @@ function handleChoice(idx) {
 }
 
 // Explanations View Trigger
-// ⚙️ quiz_player.js mein sirf is ek function ko badalna hai:
 function openExplain() {
     playSnd('snd-click');
     var data = quizData[currentIdx];
-    
-    // 🎯 MASTER CHECK: Agar JSON mein explain_img di hai, to direct use Zoom Modal mein full screen kholo
     if (data.explain_img) {
         document.getElementById('fullImg').src = data.explain_img;
         document.getElementById('zoomModal').style.display = 'flex';
-    } 
-    // 📝 Fallback: Agar sirf text hai, to purana normal text modal kholo
-    else if (data.explanation) {
+    } else if (data.explanation) {
         document.getElementById('explain-text').innerText = data.explanation;
         document.getElementById('explainModal').style.display = 'flex';
     }
@@ -193,13 +207,13 @@ function closeExplain() {
     document.getElementById('explainModal').style.display = 'none'; 
 }
 
-// 🎭 50:50 Lifeline Calculation (Works on single questions independently)
+// 🎭 50:50 Lifeline
 function useFiftyFifty() {
     if(answered || isReview || userChoices[currentIdx] !== undefined) return;
     playSnd('snd-click');
     
     var lifelineBtn = document.getElementById('fifty-fifty');
-    if(lifelineBtn) lifelineBtn.disabled = true; // Lock immediately for current question
+    if(lifelineBtn) lifelineBtn.disabled = true;
     
     var correct = quizData[currentIdx].correct;
     var btns = document.querySelectorAll('.option-btn');
@@ -214,19 +228,34 @@ function handleNext() {
     playSnd('snd-click');
     if(currentIdx === quizData.length - 1) { 
         clearInterval(timerInterval); 
-        if(!isReview) { autoSaveScore(); } 
-        showFinalPage(); 
+        if(!isReview) { 
+            autoSaveScore(); 
+            clearQuizSession(); // Quiz submit hote hi state khatam
+            showFinalPage();
+        } else {
+            // Review finish hone par dobara result pane par laao
+            clearQuizSession();
+            showFinalPage();
+        }
         return; 
     }
     currentIdx++;
     loadQuestion();
 }
 
-// 🔒 CRITICAL FIX: Har baar naya score overwrite save karega bina kisi max-condition ke!
 function autoSaveScore() {
     var finalPercent = Math.round((score / quizData.length) * 100) || 0;
     let scoreKey = `${subject}_${branch}_${type}_${quizNo}_score`;
     localStorage.setItem(scoreKey, finalPercent);
+}
+
+// Clear Session States
+function clearQuizSession() {
+    sessionStorage.removeItem('quiz_current_idx');
+    sessionStorage.removeItem('quiz_current_score');
+    sessionStorage.removeItem('quiz_user_choices');
+    sessionStorage.removeItem('quiz_time_left');
+    sessionStorage.removeItem('quiz_is_review');
 }
 
 // Show Final Performance Screen
@@ -256,13 +285,13 @@ function showFinalPage() {
 }
 
 function saveAndGoHome() {
-    // 🚀 MAGIC LINE: Browser ko bolo sirf ek step peeche chala jaye!
+    clearQuizSession();
     window.history.back();
 }
 
-// Absolute Restart Machine
 function restartQuizFresh() {
     playSnd('snd-click');
+    clearQuizSession();
     currentIdx = 0; 
     score = 0; 
     answered = false; 
@@ -282,8 +311,44 @@ function startReview() {
     playSnd('snd-click'); 
     isReview = true; 
     currentIdx = 0; 
+    sessionStorage.setItem('quiz_is_review', 'true');
     document.getElementById('game-ui').style.display = 'block'; 
     document.getElementById('final-ui').style.display = 'none'; 
+    loadQuestion(); 
+}
+
+function openZoom() { 
+    playSnd('snd-click'); 
+    document.getElementById('fullImg').src = document.getElementById('q-image').src; 
+    document.getElementById('zoomModal').style.display = 'flex'; 
+}
+function closeZoom() { 
+    document.getElementById('zoomModal').style.display = 'none'; 
+}
+
+// Initial Kickstart
+async function loadQuizDataset() {
+    try {
+        const response = await fetch(`data/${subject}/${branchFolder}/${type}_${quizNo}.json?v=${new Date().getTime()}`);
+        if(!response.ok) throw new Error("File not found");
+        quizData = await response.json();
+        
+        // Agar pehle se test chal rha tha to countdown aur loader wahi se pakdega
+        startCountdown();
+        loadQuestion();
+        
+        // Agar bacha pehle hi quiz khatam kar chuka tha aur tab refresh kiya, to direct end view
+        if(sessionStorage.getItem('quiz_current_idx') === null && userChoices.length >= quizData.length) {
+             clearInterval(timerInterval);
+             showFinalPage();
+        }
+    } catch (err) {
+        alert("Quiz data file load nahi ho saki! Path check kijiye.");
+        window.history.back();
+    }
+}
+
+loadQuizDataset();al-ui').style.display = 'none'; 
     loadQuestion(); 
 }
 
