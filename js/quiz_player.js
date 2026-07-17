@@ -116,7 +116,7 @@ function loadQuestion() {
         if(!isReview && userChoices[currentIdx] !== undefined) {
             answered = true;
             nextBtn.style.display = 'block';
-            if(quizData[currentIdx].explanation) explainBtn.style.display = 'block';
+            if(quizData[currentIdx].explanation || quizData[currentIdx].explain_img) explainBtn.style.display = 'block';
             if(i === data.correct) btn.classList.add('correct');
             if(userChoices[currentIdx] === i && i !== data.correct) btn.classList.add('wrong');
             btn.disabled = true;
@@ -166,7 +166,7 @@ function handleChoice(idx) {
     }
     
     document.getElementById('score-display').innerText = "Score: " + score;
-    if(quizData[currentIdx].explanation) { 
+    if(quizData[currentIdx].explanation || quizData[currentIdx].explain_img) { 
         document.getElementById('explain-btn').style.display = 'block'; 
     }
     document.getElementById('next-btn').style.display = 'block';
