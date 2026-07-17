@@ -318,10 +318,7 @@ function simulatePayment() {
 // --- ⚙️ ENTRY STARTUP INITS (RE-ENGINEERED FOR SESSIONSTORAGE & AUTO-REFRESH) ---
 
 function initDashboard() {
-    alert(
-    "History: " + history.state?.activeScreen +
-    "\nSubject: " + sessionStorage.getItem("last_active_subject")
-);
+    alert("init");
     updateProfileUI();
     buildSubjectCards();
 
@@ -361,6 +358,7 @@ function initDashboard() {
 
 // 📱 HARDWARE BACK BUTTON TRIGERRING ENGINE (LAST MEIN LAGAYEIN)
 window.onpopstate = function () {
+    alert('pop');
     // Browser history se current screen nikalo
     const lastScreen = history.state?.activeScreen;
 
