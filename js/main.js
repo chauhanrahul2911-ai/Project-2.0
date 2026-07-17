@@ -318,7 +318,6 @@ function simulatePayment() {
 // --- ⚙️ ENTRY STARTUP INITS (RE-ENGINEERED FOR SESSIONSTORAGE & AUTO-REFRESH) ---
 
 function initDashboard() {
-    alert("init");
     updateProfileUI();
     buildSubjectCards();
 
@@ -399,6 +398,7 @@ function isBackForwardNavigation(event) {
 }
 // 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
 window.onload = function(event) {
+    alert("load");
     if (!history.state) {
     history.replaceState({ activeScreen: "screen-subjects" }, "");
     }
@@ -406,6 +406,7 @@ window.onload = function(event) {
 };
 
 window.onpageshow = function(event) {
+    alert("pageshow");
     if (isBackForwardNavigation(event)) {
         initDashboard();
     }
