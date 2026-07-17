@@ -1,9 +1,9 @@
 // 🚀 NEW SESSIONSTORAGE PARSING ENGINE ✅
-const subject      = sessionStorage.getItem('last_active_subject'); 
-const branch       = sessionStorage.getItem('last_active_branch_guj') || ""; 
-const branchFolder = sessionStorage.getItem('last_active_branch') || ""; 
-const type         = sessionStorage.getItem('last_active_type') || "Quiz";
-const quizNo       = sessionStorage.getItem('last_active_quiz_no') || "1";
+const subject      = localStorage.getItem('last_active_subject'); 
+const branch       = localStorage.getItem('last_active_branch_guj') || ""; 
+const branchFolder = localStorage.getItem('last_active_branch') || ""; 
+const type         = localStorage.getItem('last_active_type') || "Quiz";
+const quizNo       = localStorage.getItem('last_active_quiz_no') || "1";
 
 if (!subject) {
     alert("કોઈ વિષય પસંદ કરેલ નથી! કૃપા કરીને ફરીથી પ્રયાસ કરો.");
