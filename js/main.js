@@ -318,7 +318,8 @@ function simulatePayment() {
 // --- ⚙️ ENTRY STARTUP INITS (RE-ENGINEERED FOR SESSIONSTORAGE & AUTO-REFRESH) ---
 
 function initDashboard() {
-
+    alert(history.state?.activeScreen);
+    alert(sessionStorage.getItem("last_active_subject"));
     updateProfileUI();
     buildSubjectCards();
 
