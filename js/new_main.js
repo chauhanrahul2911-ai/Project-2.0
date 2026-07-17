@@ -291,9 +291,12 @@ function buildQuizRows() {
                     loginWithGoogle();
                 } else { openPaywall(); }
             } else {
-
-                sessionStorage.setItem('last_active_branch_guj', branchGujName); 
-                sessionStorage.setItem('last_active_quiz_no', i);         
+                
+                localStorage.setItem('last_active_subject', currentSubject);
+                localStorage.setItem('last_active_branch', currentBranch);
+                localStorage.setItem('last_active_type', currentType);
+                localStorage.setItem('last_active_branch_guj', branchGujName); 
+                localStorage.setItem('last_active_quiz_no', i);         
                 window.location.href = `quiz_player.html`;            
             }
         };
