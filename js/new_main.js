@@ -361,7 +361,6 @@ function initDashboard() {
 
 // 📱 HARDWARE BACK BUTTON TRIGERRING ENGINE (LAST MEIN LAGAYEIN)
 window.onpopstate = function () {
-    alert('pop');
     // Browser history se current screen nikalo
     const lastScreen = history.state?.activeScreen;
 
@@ -402,7 +401,6 @@ function isBackForwardNavigation(event) {
 }
 // 🌐 Case 1: Jab page bilkul pehli baar normal load/refresh ho
 window.onload = function(event) {
-    alert("load");
     if (!history.state) {
     history.replaceState({ activeScreen: "screen-subjects" }, "");
     }
@@ -410,7 +408,6 @@ window.onload = function(event) {
 };
 
 window.onpageshow = function(event) {
-    alert("pageshow");
     if (isBackForwardNavigation(event)) {
         initDashboard();
     }
